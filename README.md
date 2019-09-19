@@ -7,7 +7,6 @@ This repository contains the code and schematic for a DIY MIDI to CV converter. 
 The MIDI to CV converter includes the following outputs:
 
 * Note CV output (88 keys, 1V/octave) using a 12-bit DAC
-* Note priority (highest note, lowest note, or last note) selectable with jumper or 3-way switch
 * Pitch bend CV output (0.5 +/-0.5V)
 * Velocity CV output (0 to 4V)
 * Control Change CV outout (0 to 4V)
