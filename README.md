@@ -27,6 +27,8 @@ The MIDI to CV converter includes the following outputs:
 * 3-pin header and jumper *or* 3-way switch
 
 The Arduino code uses the standard MIDI and SPI libraries, which can be found in the Arduino Library Manager. 
+https://github.com/FortySevenEffects/arduino_midi_library
+
 
 The schematic is illustrated at the bottom of this page (Eagle file included).  Input power (VIN) is 9-12V.  This is required for the Note CV op amp, used for the 0-7.3V note output.  1% metal film resistors are recommended for the 7.7K and 10K resistors, for a constant op-amp gain that does not change with temperature.  Note that 7.7K is not a standard resistor value.  I used a 3K and a 4.7K resistor in series, which are much more common values.  If precise tuning is desired, a trim pot can be added *or* the constant NOTE_SF can be adjusted in the code.  I opted for the latter.
 
