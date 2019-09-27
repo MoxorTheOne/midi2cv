@@ -16,14 +16,6 @@
 #include <MIDI.h>
 #include <SPI.h>
 
-// Note priority is set by pins A0 and A2
-// Highest note priority: A0 and A2 high (open)
-// Lowest note priority:  A0 low (ground), A2 high (open)
-// Last note priority:    A2 low (ground)
- 
-#define NP_SEL1 A0  // Note priority is set by pins A0 and A2
-#define NP_SEL2 A2  
-
 #define GATE  2
 #define TRIG  3
 #define CLOCK 4
@@ -34,9 +26,6 @@ MIDI_CREATE_DEFAULT_INSTANCE();
 
 void setup()
 {
- pinMode(NP_SEL1, INPUT_PULLUP);
- pinMode(NP_SEL2, INPUT_PULLUP);
- 
  pinMode(GATE, OUTPUT);
  pinMode(TRIG, OUTPUT);
  pinMode(CLOCK, OUTPUT);
@@ -66,7 +55,6 @@ void loop()
   int type, noteMsg, velocity, channel, d1, d2;
   static unsigned long clock_timer=0, clock_timeout=0;
   static unsigned int clock_count=0;
-  bool S1, S2;
 
   if ((trigTimer > 0) && (millis() - trigTimer > 20)) { 
     digitalWrite(TRIG,LOW); // Set trigger low after 20 msec 
@@ -100,24 +88,13 @@ void loop()
           // and choose gain = 2X
           setVoltage(DAC1, 1, 1, velocity<<5);  // DAC1, channel 1, gain = 2X
         }
-
-        // Pins NP_SEL1 and NP_SEL2 indictate note priority
-        S1 = digitalRead(NP_SEL1);
-        S2 = digitalRead(NP_SEL2);
-
-        if (S1 && S2) { // Highest note priority
-          commandTopNote();
-        }
-        else if (!S1 && S2) { // Lowest note priority
-          commandBottomNote();
-        }
-        else { // Last note priority
-           if (notes[noteMsg]) {  // If note is on and using last note priority, add to ordered list
+        
+        if (notes[noteMsg]) {  // If note is on, add to ordered list
             orderIndx = (orderIndx+1) % 20;
             noteOrder[orderIndx] = noteMsg;                 
-          }
-          commandLastNote();         
         }
+        commandLastNote();         
+        
         break;
         
       case midi::PitchBend:
@@ -161,44 +138,6 @@ void loop()
         d2 = MIDI.getData2();
     }
   }
-}
-
-void commandTopNote()
-{
-  int topNote = 0;
-  bool noteActive = false;
-  
-  for (int i=0; i<88; i++)
-  {
-    if (notes[i]) {
-      topNote = i;
-      noteActive = true;
-    }
-  }
-
-  if (noteActive) 
-    commandNote(topNote);
-  else // All notes are off, turn off gate
-    digitalWrite(GATE,LOW);  
-}
-
-void commandBottomNote()
-{
-  int bottomNote = 0;
-  bool noteActive = false;
- 
-  for (int i=87; i>=0; i--)
-  {
-    if (notes[i]) {
-      bottomNote = i;
-      noteActive = true;
-    }
-  }
-
-  if (noteActive) 
-    commandNote(bottomNote);
-  else // All notes are off, turn off gate
-    digitalWrite(GATE,LOW);
 }
 
 void commandLastNote()
